@@ -16,7 +16,7 @@ interface EvalResult {
 }
 
 export default function LiveDemoPage() {
-  const [providerWallet, setProviderWallet] = useState('');
+  const [providerWallet, setProviderWallet] = useState('0x9999999999999999999999999999999999999999');
   const [buyerWallet, setBuyerWallet] = useState('0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18');
   const [servicePrice, setServicePrice] = useState('50');
   const [serviceCategory, setServiceCategory] = useState('trading_signal');
@@ -101,7 +101,27 @@ export default function LiveDemoPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="input-group">
-            <label className="input-label">Provider Wallet</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label className="input-label">Provider Wallet</label>
+              {phase === 'idle' && (
+                <div style={{ display: 'flex', gap: 6, fontSize: 10 }}>
+                  <button
+                    type="button"
+                    onClick={() => setProviderWallet('0x9999999999999999999999999999999999999999')}
+                    style={{ background: 'var(--accent-muted)', color: 'var(--accent)', border: 'none', padding: '2px 6px', borderRadius: 4, cursor: 'pointer', fontFamily: 'var(--font-mono)' }}
+                  >
+                    Demo #1
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProviderWallet('0x742d35cc6634c0532925a3b844bc9e7595f2bd18')}
+                    style={{ background: 'var(--bg-inset)', color: 'var(--text-secondary)', border: 'none', padding: '2px 6px', borderRadius: 4, cursor: 'pointer', fontFamily: 'var(--font-mono)' }}
+                  >
+                    Demo #2
+                  </button>
+                </div>
+              )}
+            </div>
             <input
               className="input-field"
               placeholder="0x..."
