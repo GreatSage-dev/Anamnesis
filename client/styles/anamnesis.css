@@ -902,7 +902,8 @@
   color: var(--text-secondary);
   line-height: 1.65;
   max-width: 600px;
-  margin: 0 0 52px;
+  margin: 0 auto 40px;
+  text-align: center;
 }
 
 /* ─── Landing Hero ───────────────────────────────────────────────── */

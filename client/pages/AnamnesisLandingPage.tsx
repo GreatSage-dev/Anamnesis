@@ -188,9 +188,9 @@ export default function AnamnesisLandingPage() {
 
       {/* ── CTA ─────────────────────────────────────────────────── */}
       <section className="landing-section" style={{ paddingBottom: 120 }}>
-        <div className="landing-container" style={{ textAlign: 'center' }}>
+        <div className="landing-container" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <h2 className="landing-section-title" style={{ marginBottom: 16 }}>See it live</h2>
-          <p className="landing-section-desc" style={{ marginBottom: 40 }}>
+          <p className="landing-section-desc" style={{ marginBottom: 40, textAlign: 'center', margin: '0 auto 40px' }}>
             Run two evaluations on the same wallet. Watch the second pass retrieve the first as a precedent 
             from CockroachDB and shift the verdict in real time.
           </p>
