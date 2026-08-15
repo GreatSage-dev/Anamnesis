@@ -10,6 +10,7 @@ export default defineConfig({
     proxy: {
       '/approve': 'http://localhost:3000',
       '/health': 'http://localhost:3000',
+      '/api/anamnesis': 'http://localhost:3000',
     },
   },
   build: {

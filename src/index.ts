@@ -6,6 +6,8 @@ import { CONFIG } from './config';
 import { DecisionEngine } from './services/decisionEngine';
 import { x402Middleware } from './middleware/x402';
 import { errorHandler } from './middleware/errorHandler';
+import { anamnesisRouter } from './routes/anamnesis';
+import { initializeSchema } from './db/schema';
 
 const app = express();
 const decisionEngine = new DecisionEngine();
@@ -25,7 +27,7 @@ app.use((req, _res, next) => {
     } else if (req.method === 'GET') {
       req.url = '/health' + (originalUrl.includes('?') ? '?' + originalUrl.split('?')[1] : '');
     }
-  } else if (pathOnly.startsWith('/api/')) {
+  } else if (pathOnly.startsWith('/api/') && !pathOnly.startsWith('/api/anamnesis')) {
     req.url = originalUrl.replace(/^\/api/, '');
   }
   next();
@@ -83,15 +85,37 @@ app.post(['/approve', '/api/approve', '/api'], async (req: Request, res: Respons
   }
 });
 
+// ─── Anamnesis Memory Layer Routes ──────────────────────────────────
+app.use(['/api/anamnesis', '/anamnesis'], anamnesisRouter);
+
 app.use(errorHandler);
 
 if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
-  app.listen(CONFIG.PORT, () => {
-    console.log(`=======================================================`);
-    console.log(`🛡️ Custos ASP Server listening on http://localhost:${CONFIG.PORT}`);
-    console.log(`🔗 Network: X Layer (Chain ID ${CONFIG.XLAYER_CHAIN_ID})`);
-    console.log(`💳 x402 Payment Address: ${CONFIG.X402_PAYMENT_WALLET}`);
-    console.log(`=======================================================`);
+  // Initialize CockroachDB schema before starting server
+  const startServer = async () => {
+    if (CONFIG.ANAMNESIS_ENABLED && CONFIG.DATABASE_URL) {
+      try {
+        const schemaResult = await initializeSchema();
+        console.log(`🧠 Anamnesis: CockroachDB schema initialized (vector index: ${schemaResult.vector_index_status})`);
+      } catch (err: any) {
+        console.warn(`⚠️  Anamnesis: CockroachDB init warning: ${err.message}`);
+        console.warn('    Anamnesis memory features will be unavailable until DATABASE_URL is configured.');
+      }
+    }
+
+    app.listen(CONFIG.PORT, () => {
+      console.log(`=======================================================`);
+      console.log(`🛡️ Custos ASP Server listening on http://localhost:${CONFIG.PORT}`);
+      console.log(`🔗 Network: X Layer (Chain ID ${CONFIG.XLAYER_CHAIN_ID})`);
+      console.log(`💳 x402 Payment Address: ${CONFIG.X402_PAYMENT_WALLET}`);
+      console.log(`🧠 Anamnesis: ${CONFIG.ANAMNESIS_ENABLED && CONFIG.DATABASE_URL ? 'ACTIVE' : 'DISABLED (no DATABASE_URL)'}`);
+      console.log(`=======================================================`);
+    });
+  };
+
+  startServer().catch((err) => {
+    console.error('Failed to start server:', err);
+    process.exit(1);
   });
 }
 

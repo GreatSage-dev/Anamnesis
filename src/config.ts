@@ -27,4 +27,17 @@ export const CONFIG = {
     infrastructure: 80,
     general: 25,
   } as Record<string, number>,
+
+  // ─── Anamnesis: Decision Memory Layer ───────────────────────────
+  ANAMNESIS_ENABLED: process.env.ANAMNESIS_ENABLED !== 'false',
+
+  // CockroachDB Cloud
+  DATABASE_URL: process.env.DATABASE_URL || '',
+
+  // AWS Bedrock
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || '',
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || '',
+  AWS_REGION: process.env.AWS_REGION || 'us-east-1',
+  AWS_BEDROCK_EMBEDDING_MODEL: process.env.AWS_BEDROCK_EMBEDDING_MODEL || 'amazon.titan-embed-text-v2:0',
+  AWS_BEDROCK_LLM_MODEL: process.env.AWS_BEDROCK_LLM_MODEL || 'us.anthropic.claude-3-5-sonnet-20241022-v1:0',
 };
