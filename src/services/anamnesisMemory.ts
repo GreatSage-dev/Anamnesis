@@ -326,24 +326,33 @@ export async function getDecisions(
     };
   }
 
-  const pool = getPool();
-  const offset = (page - 1) * perPage;
-  const [dataResult, countResult] = await Promise.all([
-    pool.query(
-      `SELECT id, counterparty_address, created_at, onchain_signals, verdict,
-              recommended_payment_structure, reasoning_text, cited_precedent_ids
-       FROM custos_decision_memory
-       ORDER BY created_at DESC
-       LIMIT $1 OFFSET $2`,
-      [perPage, offset]
-    ),
-    pool.query('SELECT COUNT(*)::int as count FROM custos_decision_memory'),
-  ]);
+  try {
+    const pool = getPool();
+    const offset = (page - 1) * perPage;
+    const [dataResult, countResult] = await Promise.all([
+      pool.query(
+        `SELECT id, counterparty_address, created_at, onchain_signals, verdict,
+                recommended_payment_structure, reasoning_text, cited_precedent_ids
+         FROM custos_decision_memory
+         ORDER BY created_at DESC
+         LIMIT $1 OFFSET $2`,
+        [perPage, offset]
+      ),
+      pool.query('SELECT COUNT(*)::int as count FROM custos_decision_memory'),
+    ]);
 
-  return {
-    decisions: dataResult.rows,
-    total: countResult.rows[0]?.count || 0,
-  };
+    return {
+      decisions: dataResult.rows,
+      total: countResult.rows[0]?.count || 0,
+    };
+  } catch (err: any) {
+    console.warn('[Anamnesis Memory] getDecisions query failed, falling back to in-memory store:', err.message);
+    const start = (page - 1) * perPage;
+    return {
+      decisions: inMemoryStore.slice(start, start + perPage),
+      total: inMemoryStore.length,
+    };
+  }
 }
 
 export async function getStats(): Promise<{
@@ -354,7 +363,7 @@ export async function getStats(): Promise<{
 }> {
   if (!CONFIG.DATABASE_URL) {
     const total = inMemoryStore.length;
-    const approvals = inMemoryStore.filter((r) => r.verdict === 'approve').length;
+    const approvals = inMemoryStore.filter((r) => r.verdict === 'approve' || r.verdict === 'approved').length;
     const cautions = inMemoryStore.filter((r) => r.verdict === 'caution').length;
     const denials = inMemoryStore.filter((r) => r.verdict === 'deny').length;
     const uniqueAddrs = new Set(inMemoryStore.map((r) => r.counterparty_address.toLowerCase())).size;
@@ -367,27 +376,54 @@ export async function getStats(): Promise<{
     };
   }
 
-  const pool = getPool();
-  const [statsResult, recentResult] = await Promise.all([
-    pool.query(`
-      SELECT
-        COUNT(*)::int as total,
-        COUNT(*) FILTER (WHERE verdict = 'approve')::int as approvals,
-        COUNT(*) FILTER (WHERE verdict = 'caution')::int as cautions,
-        COUNT(*) FILTER (WHERE verdict = 'deny')::int as denials,
-        COUNT(DISTINCT LOWER(counterparty_address))::int as unique_counterparties
-      FROM custos_decision_memory
-    `),
-    pool.query(`
-      SELECT id, counterparty_address, created_at, onchain_signals, verdict,
-             recommended_payment_structure, reasoning_text, cited_precedent_ids
-      FROM custos_decision_memory
-      ORDER BY created_at DESC
-      LIMIT 5
-    `),
-  ]);
+  try {
+    const pool = getPool();
+    const [statsResult, recentResult] = await Promise.all([
+      pool.query(`
+        SELECT
+          COUNT(*)::int as total,
+          COUNT(*) FILTER (WHERE LOWER(verdict) IN ('approve', 'approved'))::int as approvals,
+          COUNT(*) FILTER (WHERE LOWER(verdict) = 'caution')::int as cautions,
+          COUNT(*) FILTER (WHERE LOWER(verdict) = 'deny')::int as denials,
+          COUNT(DISTINCT LOWER(counterparty_address))::int as unique_counterparties
+        FROM custos_decision_memory
+      `),
+      pool.query(`
+        SELECT id, counterparty_address, created_at, onchain_signals, verdict,
+               recommended_payment_structure, reasoning_text, cited_precedent_ids
+        FROM custos_decision_memory
+        ORDER BY created_at DESC
+        LIMIT 5
+      `),
+    ]);
 
-  const stats = statsResult.rows[0];
+    const stats = statsResult.rows[0];
+    return {
+      total_decisions: stats?.total || 0,
+      verdicts: {
+        approve: stats?.approvals || 0,
+        caution: stats?.cautions || 0,
+        deny: stats?.denials || 0,
+      },
+      unique_counterparties: stats?.unique_counterparties || 0,
+      recent_decisions: recentResult.rows || [],
+    };
+  } catch (err: any) {
+    console.warn('[Anamnesis Memory] getStats query failed, falling back to in-memory store:', err.message);
+    const total = inMemoryStore.length;
+    const approvals = inMemoryStore.filter((r) => r.verdict === 'approve' || r.verdict === 'approved').length;
+    const cautions = inMemoryStore.filter((r) => r.verdict === 'caution').length;
+    const denials = inMemoryStore.filter((r) => r.verdict === 'deny').length;
+    const uniqueAddrs = new Set(inMemoryStore.map((r) => r.counterparty_address.toLowerCase())).size;
+
+    return {
+      total_decisions: total,
+      verdicts: { approve: approvals, caution: cautions, deny: denials },
+      unique_counterparties: uniqueAddrs,
+      recent_decisions: inMemoryStore.slice(0, 5),
+    };
+  }
+}
   return {
     total_decisions: stats.total,
     verdicts: {
