@@ -424,14 +424,3 @@ export async function getStats(): Promise<{
     };
   }
 }
-  return {
-    total_decisions: stats.total,
-    verdicts: {
-      approve: stats.approvals,
-      caution: stats.cautions,
-      deny: stats.denials,
-    },
-    unique_counterparties: stats.unique_counterparties,
-    recent_decisions: recentResult.rows,
-  };
-}
