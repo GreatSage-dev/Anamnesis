@@ -3,6 +3,7 @@ import cors from 'cors';
 import { z } from 'zod';
 import { CONFIG } from '../src/config';
 import { DecisionEngine } from '../src/services/decisionEngine';
+import { anamnesisRouter } from '../src/routes/anamnesis';
 
 const app = express();
 app.set('json spaces', 2);
@@ -16,6 +17,9 @@ try {
 
 app.use(cors());
 app.use(express.json());
+
+// Mount Anamnesis router for Vercel Serverless Function
+app.use(['/api/anamnesis', '/anamnesis'], anamnesisRouter);
 
 const approveSchema = z.object({
   provider_wallet: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid provider wallet EVM address'),
