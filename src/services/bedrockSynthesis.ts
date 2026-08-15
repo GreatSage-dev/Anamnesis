@@ -187,7 +187,7 @@ Reasoning: ${base_verdict.reasoning.join(' ')}
       msg += `
 **Precedent ID: ${p.id}** (${matchLabel})
 - Past Verdict: ${p.verdict}
-- Past Recommended Payment: ${p.recommended_payment}
+- Past Recommended Payment: ${p.recommended_payment_structure?.type || 'split'}
 - Past Reasoning: ${p.reasoning_text}
 `;
     }
