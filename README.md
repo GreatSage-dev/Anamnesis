@@ -5,7 +5,7 @@
 **Built for CockroachDB Cloud × AWS Hackathon • Powering Custos (OKX X Layer Agent 7327)**
 
 [![CockroachDB Cloud](https://img.shields.io/badge/CockroachDB-Cloud_Serverless_C--SPANN-6366f1?style=for-the-badge&logo=cockroachlabs)](https://cockroachlabs.cloud)
-[![Amazon Bedrock](https://img.shields.io/badge/AWS_Bedrock-Titan_v2_%2B_Claude_3.5_Sonnet-FF9900?style=for-the-badge&logo=amazonaws)](https://aws.amazon.com/bedrock/)
+[![Amazon Bedrock](https://img.shields.io/badge/AWS_Bedrock-Titan_v2_%2B_Claude_Sonnet_4.5-FF9900?style=for-the-badge&logo=amazonaws)](https://aws.amazon.com/bedrock/)
 [![OKX X Layer](https://img.shields.io/badge/OKX_X_Layer-Testnet_1952-000000?style=for-the-badge&logo=okx)](https://testrpc.xlayer.tech)
 [![Fail--Open Architecture](https://img.shields.io/badge/Resilience-Fail--Open_Fallback-10b981?style=for-the-badge)](#-fail-open-downtime-resilience)
 
@@ -25,7 +25,7 @@ A malicious actor or wash-trader can easily bypass single-snapshot security by s
 ### The Solution: Anamnesis Decision Memory
 **Anamnesis** gives Custos persistent, searchable decision memory across time. Every security evaluation is transformed into a **1024-dimensional vector embedding** (via **Amazon Titan Text Embeddings v2**) and stored inside **CockroachDB Cloud Serverless** with a **C-SPANN vector index**.
 
-When a counterparty is evaluated, Anamnesis retrieves past decisions in `< 25ms` and feeds them to **Amazon Bedrock (Claude 3.5 Sonnet)** to cite exact historical precedents and detect cross-session fraud patterns.
+When a counterparty is evaluated, Anamnesis retrieves past decisions in `< 35ms` and feeds them to **Amazon Bedrock (Claude Sonnet 4.5)** to cite exact historical precedents and detect cross-session fraud patterns.
 
 ---
 
@@ -56,7 +56,7 @@ sequenceDiagram
     Engine->>Engine: Compute Immutable Deterministic Base Verdict
 
     alt Precedents Found
-        Engine->>Bedrock: Synthesize Verdict with Cited Precedent UUIDs (Claude 3.5 Sonnet)
+        Engine->>Bedrock: Synthesize Verdict with Cited Precedent UUIDs (Claude Sonnet 4.5)
         Bedrock-->>Engine: Synthesis Output + Validated Cited Precedent UUIDs
     else No Precedents
         Engine->>Engine: Fast-path Baseline Synthesis

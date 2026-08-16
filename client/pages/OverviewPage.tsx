@@ -52,7 +52,7 @@ export default function Overview() {
             <span style={{ color: 'var(--text-tertiary)' }}>|</span>
             <span style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>C-SPANN Vector Index (1024-dim)</span>
             <span style={{ color: 'var(--text-tertiary)' }}>|</span>
-            <span style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>Amazon Bedrock Titan v2 + Claude 3.5</span>
+            <span style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>Amazon Bedrock Titan v2 + Claude Sonnet 4.5</span>
           </div>
           <span className="landing-hero-badge" style={{ margin: 0, fontSize: 10, padding: '3px 10px' }}>
             🟢 FAIL-OPEN RESILIENT

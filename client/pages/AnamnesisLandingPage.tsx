@@ -163,7 +163,7 @@ export default function AnamnesisLandingPage() {
               </div>
               <h3 className="landing-arch-title">Amazon Bedrock</h3>
               <p className="landing-arch-desc">
-                Titan Text Embeddings v2 (1024-dim, unit-normalized). Claude 3.5 Sonnet / Nova 
+                Titan Text Embeddings v2 (1024-dim, unit-normalized). Claude Sonnet 4.5 / Nova 
                 for precedent-informed verdict synthesis with cited reasoning.
               </p>
               <div className="landing-arch-tag">Embeddings + Reasoning</div>
