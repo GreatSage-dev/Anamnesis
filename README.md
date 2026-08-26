@@ -172,9 +172,9 @@ cd Anamnesis
 npm install
 
 # 3. Configure Environment (.env)
-# DATABASE_URL=postgresql://Mrsage:wNcctJs_WNTKPDmcDtHaqw@anamnesis-32019.j77.aws-us-east-1.cockroachlabs.cloud:26257/defaultdb?sslmode=no-verify
-# AWS_ACCESS_KEY_ID=AKIAXEOALYRZ7YC6VREL
-# AWS_SECRET_ACCESS_KEY=...
+# DATABASE_URL=postgresql://<user>:<password>@<cluster-host>:26257/defaultdb?sslmode=verify-full
+# AWS_ACCESS_KEY_ID=your_aws_access_key
+# AWS_SECRET_ACCESS_KEY=your_aws_secret_key
 # AWS_REGION=us-east-1
 
 # 4. Start Development Server (Express API :3000 + Vite Frontend :5173)
